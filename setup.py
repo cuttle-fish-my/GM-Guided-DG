@@ -3,5 +3,16 @@ from setuptools import setup
 setup(
     name="GGADG",
     py_modules=["GGADG"],
-    install_requires=["blobfile>=1.0.5", "torch", "tqdm"],
+    install_requires=[
+        "matplotlib",
+        "numpy",
+        "torch",
+        "torchvision",
+        "einops",
+        "tqdm",
+        "blobfile",
+        "monai",
+        "nibabel",
+        "tensorboard"
+    ],
 )
