@@ -1,5 +1,9 @@
 # Gradient-Guided Adaptive Domain Generalization for Cross Modality MRI Segmentation
 ## Guidelines
+### 0. Platform Support
+We only guarantee the correctness of the code on the following platform:
+* Linux
+* MacOS (with `MPS` enabled only for inference)
 ### 1. Install dependencies
 We highly recommend you to create a new virtual environment for this project. The following command will install all the dependencies.
 ```bash
@@ -40,14 +44,84 @@ MS-CMRSeg2019_Raw
 We provide the preprocessing script for each dataset. You can preprocess the dataset with the following commands:
 #### BraTS2018
 ```bash
-python datasets/BraTS_2018.py --root datasets/BraTS2018_Raw --save_dir datasets/BraTS --source <source_modality> --target <target_modality> --train_source True --val_target True
+declare -a SOURCE=("t2" "flair")
+declare -a TARGET=("t1" "t1ce")
+for source in ${SOURCE[@]}
+do
+  for target in ${TARGET[@]}
+  do
+    python datasets/BraTS_2018.py \
+            --root datasets/BraTS2018_Raw \
+            --save_dir datasets/BraTS_2018 \
+            --source $source \
+            --target $target \
+            --train_source True \
+            --val_target True
+  done
+done
 ```
 #### MS-CMRSeg2019
 ```bash
-python datasets/MS-CMRSeg2019.py --root datasets/MS-CMRSeg2019_Raw --save_dir datasets/MS-CMRSeg2019 --source <source_modality> --target <target_modality> --train_source True --val_target True
+source="C0"
+declare -a TARGET=("T2" "LGE")
+for target in ${TARGET[@]}
+do
+  python datasets/MSCMRSeg2019.py \
+          --root datasets/MS-CMRSeg2019_Raw \
+          --save_dir datasets/MS-CMRSeg2019 \
+          --source $source \
+          --target $target \
+          --train_source True \
+          --val_target True
+done
 ```
 ### 4. Train the model
 You can train the model with the following command:
 ```bash
-
+python ./scripts/Unet_train.py \
+        --data_dir ./datasets/<DATASET>/train \
+        --use_fp16 False \
+        --save_dir ./saved_models/<EXP_Name> \
+        --lr 1e-4 \
+        --batch_size 24 \
+        --save_interval 1000 \
+        --lr_anneal_steps 10000 \
+        --modality source \
+        --input_mode magnitude \
+        --heavy_aug True
 ```
+You can visualize the intermediate results with the following command:
+```bash
+tensorboard --logdir ./saved_models/<EXP_NAME>
+```
+#### Remark: 
+* `<DATASET>` is the name of generated folders in [Section 3](#3-preprocess-the-dataset).
+* Only set `--use_fp16` `True` when using NVIDIA GPU.
+### 5. Test the model
+You can test the model with the following command:
+```bash
+python ./scripts/Unet_val.py \
+--data_dir ./datasets/<DATASET>/val \
+--save_dir ../val_res/<EXP_NAME> \
+--model_path ../saved_models/<EXP_NAME>/model010000.pt \
+--dropout 0.0 \
+--input_mode magnitude \
+--modality target \
+--TTA_mode PseudoLabel \
+--TTA_lr 1e-2 \
+--TTA_steps 2 \
+--TTA_episodic True \
+--TTA_alpha <TTA_ALPHA> \
+--TTA_class_idx 1 \
+--lambda_BN 0.4 \
+--lambda_ent 1 \
+--lambda_consistency 1
+```
+#### Remark:
+* `<TTA_ALPHA>` is `0.5` for BraTS2018 and `0.9` for MS-CMRSeg2019
+
+If you want to see the segmentation results and formal evaluation metrics, use the following command:
+```bash
+tensorboard --logdir ./val_res/<EXP_NAME>
+```
+

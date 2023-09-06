@@ -217,7 +217,7 @@ class ResBlock(TwoInputBlock):
             use_checkpoint=False,
             up=False,
             down=False,
-            norm_type="GN",
+            norm_type="BN",
     ):
         super().__init__()
         self.channels = channels
@@ -320,7 +320,7 @@ class AttentionBlock(nn.Module):
             num_head_channels=-1,
             use_checkpoint=False,
             use_new_attention_order=False,
-            norm_type="GN",
+            norm_type="BN",
     ):
         super().__init__()
         self.channels = channels
@@ -502,7 +502,7 @@ class UNetModel(nn.Module):
             use_scale_shift_norm=False,
             resblock_updown=False,
             use_new_attention_order=False,
-            norm_type="GN",
+            norm_type="BN",
     ):
         super().__init__()
 

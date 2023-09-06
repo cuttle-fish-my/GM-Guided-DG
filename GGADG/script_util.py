@@ -20,8 +20,8 @@ def model_defaults():
         resblock_updown=True,
         use_fp16=False,
         use_new_attention_order=False,
-        in_channels=1,
-        norm_type="GN",
+        in_channels=3,
+        norm_type="BN",
     )
     return res
 
@@ -29,7 +29,7 @@ def model_defaults():
 def create_model(image_size, num_channels, num_res_blocks, channel_mult="", learn_sigma=False, use_checkpoint=False,
                  attention_resolutions="16", num_heads=1, num_head_channels=-1, num_heads_upsample=-1,
                  use_scale_shift_norm=False, dropout=0, resblock_updown=False, use_fp16=False,
-                 use_new_attention_order=False, Segment=False, num_class=4, in_channels=1, norm_type="GN"):
+                 use_new_attention_order=False, Segment=False, num_class=4, in_channels=3, norm_type="BN"):
     if channel_mult == "":
         if image_size == 512:
             channel_mult = (0.5, 1, 1, 2, 2, 4, 4)

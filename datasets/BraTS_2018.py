@@ -16,8 +16,8 @@ resize_size = 128
 
 class BraTSProcessor(BaseProcessor):
     def __init__(self, save_dir, root, source, target):
-        assert source in ["flair", "t1", "t1ce", "t2"]
-        assert target in ["flair", "t1", "t1ce", "t2"]
+        assert source in ["flair", "t1", "t1ce", "t2"], f"get {source}"
+        assert target in ["flair", "t1", "t1ce", "t2"], f"get {target}"
         super().__init__(save_dir, root, source, target, ["BG", "Tumor"])
 
         self.val_list = sorted(glob(f"{self.root}/HGG/Brats18*"))[-21:] + sorted(glob(f"{self.root}/LGG/Brats18*"))[-7:]

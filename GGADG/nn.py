@@ -65,7 +65,7 @@ def zero_module(module):
     return module
 
 
-def normalization(channels, norm_type="GN"):
+def normalization(channels, norm_type="BN"):
     """
     Make a standard normalization layer.
 
