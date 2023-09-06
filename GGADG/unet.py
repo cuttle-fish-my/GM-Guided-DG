@@ -7,9 +7,9 @@ import torch as th
 import torch.nn as nn
 import torch.nn.functional as F
 
-from guided_diffusion import utils
-from guided_diffusion.fp16_util import convert_module_to_f16, convert_module_to_f32
-from guided_diffusion.nn import (
+from GGADG import utils
+from GGADG.fp16_util import convert_module_to_f16, convert_module_to_f32
+from GGADG.nn import (
     checkpoint,
     conv_nd,
     linear,

@@ -10,11 +10,7 @@ from torchvision.transforms import functional as F
 from DatasetProcessor import BaseProcessor
 
 crop_size = 128
-image_size = 128
 
-
-# source: LGE
-# target: C0
 
 class MSCMRSeg2019Processor(BaseProcessor):
     def __init__(self, save_dir, root, source, target, source_len=None):

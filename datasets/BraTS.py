@@ -9,7 +9,7 @@ import torch
 from torchvision.transforms import InterpolationMode as IM
 from torchvision.transforms import functional as F
 
-from datasets.DatasetProcessor import BaseProcessor
+from DatasetProcessor import BaseProcessor
 
 resize_size = 128
 
@@ -32,7 +32,7 @@ class BraTSProcessor(BaseProcessor):
         return len(self.folder_list)
 
     @staticmethod
-    def _BBox(img_1, img_2):
+    def BBox(img_1, img_2):
         x_1, y_1, z_1 = np.where(img_1.astype(np.int32) != 0)
         x_2, y_2, z_2 = np.where(img_2.astype(np.int32) != 0)
 
@@ -56,7 +56,7 @@ class BraTSProcessor(BaseProcessor):
         targets = np.transpose(targets, (2, 0, 1))
         label = np.transpose(label, (2, 0, 1))
 
-        x_min, x_max, y_min, y_max, z_min, z_max = self._BBox(sources, targets)
+        x_min, x_max, y_min, y_max, z_min, z_max = self.BBox(sources, targets)
 
         sources = torch.Tensor(sources[x_min:x_max, y_min:y_max, z_min:z_max])
         targets = torch.Tensor(targets[x_min:x_max, y_min:y_max, z_min:z_max])
@@ -75,21 +75,6 @@ class BraTSProcessor(BaseProcessor):
         assert os.path.dirname(self.source_dir[i]) == self.folder_list[i]
         mode = "val" if self.folder_list[i] in self.val_list else "train"
         return mode, deepcopy(mode)
-
-    def BBOX(self, i):
-        sources = nib.load(self.source_dir[i]).get_fdata()
-        origin_shape = sources.shape
-        targets = nib.load(self.target_dir[i]).get_fdata()
-        label = nib.load(self.label_dir[i]).get_fdata()
-
-        label[label != 0] = 1
-
-        sources = np.transpose(sources, (2, 0, 1))
-        targets = np.transpose(targets, (2, 0, 1))
-        label = np.transpose(label, (2, 0, 1))
-
-        x_min, x_max, y_min, y_max, z_min, z_max = self._BBox(sources, targets)
-        return y_min, y_max, z_min, z_max, origin_shape
 
 
 if __name__ == "__main__":

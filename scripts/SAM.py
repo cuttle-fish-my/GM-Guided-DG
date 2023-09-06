@@ -4,20 +4,20 @@ import io
 import pathlib
 import sys
 
+import PIL.Image as Image
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import torchvision.transforms
-from cv2 import cv2
 from einops import rearrange
 from segment_anything import SamPredictor, sam_model_registry
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 
-from guided_diffusion import utils
-from guided_diffusion.image_datasets import ImageDataset
-from guided_diffusion.utils import COLORS
+from GGADG import utils
+from GGADG.image_datasets import ImageDataset
+from GGADG.utils import COLORS
 
 COLORS = COLORS.numpy()
 
@@ -52,8 +52,9 @@ def main(opts):
 
         if opts.pseudo_label_dir != "":
             label = glob.glob(f"{opts.pseudo_label_dir}/{i}_*.png")[0]
-            label = cv2.imread(label, cv2.IMREAD_GRAYSCALE).astype(np.float32)
-            label = torch.tensor((label / 255 / 0.8 * num_class).astype(np.int64))[None, None]
+            label = torchvision.transforms.ToTensor()(Image.open(label).convert('L')).to(torch.float32)
+            label = label * num_class / 0.8
+            label = label.round().to(torch.int64)[None, None]
 
         pred = np.zeros([1, num_class, *img.shape[:2]])
         tb_img = [img.astype(np.float32) / 255]

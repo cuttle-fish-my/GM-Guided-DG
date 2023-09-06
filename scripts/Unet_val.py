@@ -1,6 +1,3 @@
-"""
-Train a diffusion model on images.
-"""
 import argparse
 import os
 import pathlib
@@ -14,16 +11,16 @@ from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 
-from guided_diffusion import utils
-from guided_diffusion.image_datasets import ImageDataset
-from guided_diffusion.losses import entropy_map
-from guided_diffusion.script_util import (
+from GGADG import utils
+from GGADG.image_datasets import ImageDataset
+from GGADG.losses import entropy_map
+from GGADG.script_util import (
     model_defaults,
     create_model,
     args_to_dict,
     add_dict_to_argparser,
 )
-from guided_diffusion.train_util import TestTimeAdaptationAgent, PseudoLabelAgent
+from GGADG.train_util import TestTimeAdaptationAgent, PseudoLabelAgent
 
 
 def main():

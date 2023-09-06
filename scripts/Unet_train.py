@@ -1,21 +1,17 @@
-"""
-Train a diffusion model on images.
-"""
-
 import argparse
 
 from torch.utils.tensorboard import SummaryWriter
 
-from guided_diffusion import utils
-from guided_diffusion import logger
-from guided_diffusion.image_datasets import ImageDataset, UnpairedDataset, load_data
-from guided_diffusion.script_util import (
+from GGADG import utils
+from GGADG import logger
+from GGADG.image_datasets import ImageDataset, UnpairedDataset, load_data
+from GGADG.script_util import (
     model_defaults,
     create_model,
     args_to_dict,
     add_dict_to_argparser,
 )
-from guided_diffusion.train_util import SegmentTrainLoop, UDATrainLoop
+from GGADG.train_util import SegmentTrainLoop, UDATrainLoop
 
 
 def main():

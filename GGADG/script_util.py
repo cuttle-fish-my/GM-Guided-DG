@@ -1,5 +1,5 @@
 import argparse
-from guided_diffusion.unet import UNetModel, SegUnet, SegUnet
+from GGADG.unet import UNetModel, SegUnet
 
 NUM_CLASSES = 1000
 

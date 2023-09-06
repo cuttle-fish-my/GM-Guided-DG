@@ -1,7 +1,3 @@
-"""
-Various utilities for neural networks.
-"""
-
 import math
 
 import torch as th

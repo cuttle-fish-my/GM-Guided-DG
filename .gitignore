@@ -7,12 +7,8 @@ imgaug
 *.jpg
 *.png
 *.npz
-*.xml
 *.zip
 *.gz
-*.txt
-*.csv
-*.json
 *.pkl
 event*
 

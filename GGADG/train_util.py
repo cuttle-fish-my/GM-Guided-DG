@@ -7,17 +7,14 @@ from einops import rearrange
 from torch.nn import functional as F
 from torch.optim import AdamW
 
-from guided_diffusion import logger
-from guided_diffusion import utils
-from guided_diffusion.fp16_util import MixedPrecisionTrainer
-from guided_diffusion.losses import *
-from guided_diffusion.nn import update_ema
-from guided_diffusion.script_util import create_model, args_to_dict, model_defaults
-from guided_diffusion.unet import Discriminator
+from GGADG import logger
+from GGADG import utils
+from GGADG.fp16_util import MixedPrecisionTrainer
+from GGADG.losses import *
+from GGADG.nn import update_ema
+from GGADG.script_util import create_model, args_to_dict, model_defaults
+from GGADG.unet import Discriminator
 
-# For ImageNet experiments, this was a good default value.
-# We found that the lg_loss_scale quickly climbed to
-# 20-21 within the first ~1K steps of training.
 INITIAL_LOG_LOSS_SCALE = 20.0
 
 
