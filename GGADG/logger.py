@@ -1,13 +1,11 @@
 import os
 import sys
 import os.path as osp
-import json
-import time
 import datetime
 import tempfile
 import warnings
 from collections import defaultdict
-from contextlib import contextmanager
+
 
 DEBUG = 10
 INFO = 20
@@ -89,21 +87,6 @@ class HumanOutputFormat(KVWriter, SeqWriter):
             self.file.close()
 
 
-class JSONOutputFormat(KVWriter):
-    def __init__(self, filename):
-        self.file = open(filename, "wt")
-
-    def writekvs(self, kvs):
-        for k, v in sorted(kvs.items()):
-            if hasattr(v, "dtype"):
-                kvs[k] = float(v)
-        self.file.write(json.dumps(kvs) + "\n")
-        self.file.flush()
-
-    def close(self):
-        self.file.close()
-
-
 class CSVOutputFormat(KVWriter):
     def __init__(self, filename):
         self.file = open(filename, "w+t")
@@ -141,66 +124,16 @@ class CSVOutputFormat(KVWriter):
         self.file.close()
 
 
-class TensorBoardOutputFormat(KVWriter):
-    """
-    Dumps key/value pairs into TensorBoard's numeric format.
-    """
-
-    def __init__(self, dir):
-        os.makedirs(dir, exist_ok=True)
-        self.dir = dir
-        self.step = 1
-        prefix = "events"
-        path = osp.join(osp.abspath(dir), prefix)
-        import tensorflow as tf
-        from tensorflow.python import pywrap_tensorflow
-        from tensorflow.core.util import event_pb2
-        from tensorflow.python.util import compat
-
-        self.tf = tf
-        self.event_pb2 = event_pb2
-        self.pywrap_tensorflow = pywrap_tensorflow
-        self.writer = pywrap_tensorflow.EventsWriter(compat.as_bytes(path))
-
-    def writekvs(self, kvs):
-        def summary_val(k, v):
-            kwargs = {"tag": k, "simple_value": float(v)}
-            return self.tf.Summary.Value(**kwargs)
-
-        summary = self.tf.Summary(value=[summary_val(k, v) for k, v in kvs.items()])
-        event = self.event_pb2.Event(wall_time=time.time(), summary=summary)
-        event.step = (
-            self.step
-        )  # is there any reason why you'd want to specify the step?
-        self.writer.WriteEvent(event)
-        self.writer.Flush()
-        self.step += 1
-
-    def close(self):
-        if self.writer:
-            self.writer.Close()
-            self.writer = None
-
-
 def make_output_format(format, ev_dir, log_suffix=""):
     os.makedirs(ev_dir, exist_ok=True)
     if format == "stdout":
         return HumanOutputFormat(sys.stdout)
     elif format == "log":
         return HumanOutputFormat(osp.join(ev_dir, "log%s.txt" % log_suffix))
-    elif format == "json":
-        return JSONOutputFormat(osp.join(ev_dir, "progress%s.json" % log_suffix))
     elif format == "csv":
         return CSVOutputFormat(osp.join(ev_dir, "progress%s.csv" % log_suffix))
-    elif format == "tensorboard":
-        return TensorBoardOutputFormat(osp.join(ev_dir, "tb%s" % log_suffix))
     else:
         raise ValueError("Unknown format specified: %s" % (format,))
-
-
-# ================================================================
-# API
-# ================================================================
 
 
 def logkv(key, val):
@@ -219,14 +152,6 @@ def logkv_mean(key, val):
     get_current().logkv_mean(key, val)
 
 
-def logkvs(d):
-    """
-    Log a dictionary of key-value pairs
-    """
-    for (k, v) in d.items():
-        logkv(k, v)
-
-
 def dumpkvs():
     """
     Write all of the diagnostics from the current iteration
@@ -234,42 +159,11 @@ def dumpkvs():
     return get_current().dumpkvs()
 
 
-def getkvs():
-    return get_current().name2val
-
-
 def log(*args, level=INFO):
     """
     Write the sequence of args, with no separators, to the console and output files (if you've configured an output file).
     """
     get_current().log(*args, level=level)
-
-
-def debug(*args):
-    log(*args, level=DEBUG)
-
-
-def info(*args):
-    log(*args, level=INFO)
-
-
-def warn(*args):
-    log(*args, level=WARN)
-
-
-def error(*args):
-    log(*args, level=ERROR)
-
-
-def set_level(level):
-    """
-    Set logging threshold on current logger.
-    """
-    get_current().set_level(level)
-
-
-def set_comm(comm):
-    get_current().set_comm(comm)
 
 
 def get_dir():
@@ -282,38 +176,6 @@ def get_dir():
 
 record_tabular = logkv
 dump_tabular = dumpkvs
-
-
-@contextmanager
-def profile_kv(scopename):
-    logkey = "wait_" + scopename
-    tstart = time.time()
-    try:
-        yield
-    finally:
-        get_current().name2val[logkey] += time.time() - tstart
-
-
-def profile(n):
-    """
-    Usage:
-    @profile("my_func")
-    def my_func(): code
-    """
-
-    def decorator_with_name(func):
-        def func_wrapper(*args, **kwargs):
-            with profile_kv(n):
-                return func(*args, **kwargs)
-
-        return func_wrapper
-
-    return decorator_with_name
-
-
-# ================================================================
-# Backend
-# ================================================================
 
 
 def get_current():
@@ -404,12 +266,6 @@ def get_rank_without_mpi_import():
 
 
 def mpi_weighted_mean(comm, local_name2valcount):
-    """
-    Copied from: https://github.com/openai/baselines/blob/ea25b9e8b234e6ee1bca43083f8f3cf974143998/baselines/common/mpi_util.py#L110
-    Perform a weighted average over dicts that are each on a different node
-    Input: local_name2valcount: dict mapping key -> (value, count)
-    Returns: key -> mean
-    """
     all_name2valcount = comm.gather(local_name2valcount)
     if comm.rank == 0:
         name2sum = defaultdict(float)
@@ -442,7 +298,7 @@ def configure(dir=None, format_strs=None, comm=None, log_suffix=""):
     if dir is None:
         dir = osp.join(
             tempfile.gettempdir(),
-            datetime.datetime.now().strftime("openai-%Y-%m-%d-%H-%M-%S-%f"),
+            datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f"),
         )
     assert isinstance(dir, str)
     dir = os.path.expanduser(dir)
@@ -453,10 +309,7 @@ def configure(dir=None, format_strs=None, comm=None, log_suffix=""):
         log_suffix = log_suffix + "-rank%03i" % rank
 
     if format_strs is None:
-        if rank == 0:
-            format_strs = os.getenv("OPENAI_LOG_FORMAT", "stdout,log,csv").split(",")
-        else:
-            format_strs = os.getenv("OPENAI_LOG_FORMAT_MPI", "log").split(",")
+        format_strs = os.getenv("OPENAI_LOG_FORMAT", "stdout,log,csv").split(",")
     format_strs = filter(None, format_strs)
     output_formats = [make_output_format(f, dir, log_suffix) for f in format_strs]
 
@@ -468,22 +321,3 @@ def configure(dir=None, format_strs=None, comm=None, log_suffix=""):
 def _configure_default_logger():
     configure()
     Logger.DEFAULT = Logger.CURRENT
-
-
-def reset():
-    if Logger.CURRENT is not Logger.DEFAULT:
-        Logger.CURRENT.close()
-        Logger.CURRENT = Logger.DEFAULT
-        log("Reset logger")
-
-
-@contextmanager
-def scoped_configure(dir=None, format_strs=None, comm=None):
-    prevlogger = Logger.CURRENT
-    configure(dir=dir, format_strs=format_strs, comm=comm)
-    try:
-        yield
-    finally:
-        Logger.CURRENT.close()
-        Logger.CURRENT = prevlogger
-

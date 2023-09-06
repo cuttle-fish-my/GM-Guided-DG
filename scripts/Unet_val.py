@@ -50,7 +50,7 @@ def main():
     elif args.TTA_mode == "PseudoLabel":
         model = PseudoLabelAgent(args, writer, dataset.meta_info['class_prior'])
     elif args.TTA_mode is None:
-        model = create_model(Segment=True, num_class=args.num_class, **args_to_dict(args, model_defaults().keys()))
+        model = create_model(num_class=args.num_class, **args_to_dict(args, model_defaults().keys()))
         model.load_state_dict(utils.load_state_dict(args.model_path, map_location="cpu"))
         model = model.to(utils.dev())
     else:

@@ -18,6 +18,48 @@ from GGADG.unet import Discriminator
 INITIAL_LOG_LOSS_SCALE = 20.0
 
 
+def parse_resume_step_from_filename(filename):
+    """
+    Parse filenames of the form path/to/modelNNNNNN.pt, where NNNNNN is the
+    checkpoint's number of steps.
+    """
+    split = filename.split("model")
+    if len(split) < 2:
+        return 0
+    split1 = split[-1].split(".")[0]
+    try:
+        return int(split1)
+    except ValueError:
+        return 0
+
+
+def get_blob_logdir():
+    # You can change this to be a separate path to save checkpoints to
+    # a blobstore or some external drive.
+    return logger.get_dir()
+
+
+def find_resume_checkpoint():
+    # On your infrastructure, you may want to override this to automatically
+    # discover the latest checkpoint on your blob storage, etc.
+    return None
+
+
+def find_ema_checkpoint(main_checkpoint, step, rate):
+    if main_checkpoint is None:
+        return None
+    filename = f"ema_{rate}_{step :06d}.pt"
+    path = bf.join(bf.dirname(main_checkpoint), filename)
+    if bf.exists(path):
+        return path
+    return None
+
+
+def log_loss_dict(losses):
+    for key, values in losses.items():
+        logger.logkv_mean(key, values.mean().item())
+
+
 class TrainLoop:
     def __init__(
             self,
@@ -219,48 +261,6 @@ class TrainLoop:
         self.writer.add_image(f"{'source' if label is not None else 'target'}/{self.step}", tb_img, dataformats="CHW")
 
 
-def parse_resume_step_from_filename(filename):
-    """
-    Parse filenames of the form path/to/modelNNNNNN.pt, where NNNNNN is the
-    checkpoint's number of steps.
-    """
-    split = filename.split("model")
-    if len(split) < 2:
-        return 0
-    split1 = split[-1].split(".")[0]
-    try:
-        return int(split1)
-    except ValueError:
-        return 0
-
-
-def get_blob_logdir():
-    # You can change this to be a separate path to save checkpoints to
-    # a blobstore or some external drive.
-    return logger.get_dir()
-
-
-def find_resume_checkpoint():
-    # On your infrastructure, you may want to override this to automatically
-    # discover the latest checkpoint on your blob storage, etc.
-    return None
-
-
-def find_ema_checkpoint(main_checkpoint, step, rate):
-    if main_checkpoint is None:
-        return None
-    filename = f"ema_{rate}_{step :06d}.pt"
-    path = bf.join(bf.dirname(main_checkpoint), filename)
-    if bf.exists(path):
-        return path
-    return None
-
-
-def log_loss_dict(losses):
-    for key, values in losses.items():
-        logger.logkv_mean(key, values.mean().item())
-
-
 class SegmentTrainLoop(TrainLoop):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -375,7 +375,7 @@ class TestTimeAdaptationAgent(torch.nn.Module):
     def __init__(self, opts, writer):
         super().__init__()
 
-        model = create_model(Segment=True, num_class=opts.num_class, **args_to_dict(opts, model_defaults().keys()))
+        model = create_model(num_class=opts.num_class, **args_to_dict(opts, model_defaults().keys()))
         model.load_state_dict(
             utils.load_state_dict(opts.model_path, map_location="cpu")
         )
@@ -454,7 +454,6 @@ class TestTimeAdaptationAgent(torch.nn.Module):
         # adapt
         loss, entropy = entropy_loss(pred)
         loss = self.lambda_ent * loss
-        hard_pred = torch.argmax(pred, dim=1, keepdim=True)
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
@@ -542,59 +541,3 @@ class PseudoLabelAgent(TestTimeAdaptationAgent):
         new_prior = self.TTA_alpha / self.num_class + (1 - self.TTA_alpha) * new_prior
         self.prior = self.TTA_alpha * self.prior + (1 - self.TTA_alpha) * new_prior
         return posterior, entropy_map(posterior, reduce=True)
-
-
-class TSNEAgent(PseudoLabelAgent):
-    def __init__(self, opts, writer, prior):
-        super().__init__(opts, writer, prior)
-
-    def forward(self, x, out_dict):
-        self.reset()
-        preds = []
-        features = []
-        pred = []
-        feature = []
-
-        self.model.train()
-        _ = self.model(x)
-        self.model.eval()
-
-        self.prior = (1 - self.TTA_alpha) * self.global_prior + self.TTA_alpha / self.num_class
-
-        for step in range(self.steps):
-            pred, feature = self.forward_and_adapt(x)
-            preds.append(torch.argmax(pred, dim=1).flatten().detach().cpu().numpy())
-            features.append(rearrange(feature, "b c h w -> (b h w) c").detach().cpu().numpy())
-        return preds, features
-
-    def forward_and_adapt(self, x):
-
-        # Test Time Augmentation
-        x = torch.cat([x, torch.flip(x, dims=[3])], dim=0)
-        pred, feature = self.model(x, last_feature=True)
-        pred = torch.cat([pred[0:1], torch.flip(pred[1:2], dims=[3])], dim=0)
-        feature = torch.cat([feature[0:1], torch.flip(feature[1:2], dims=[3])], dim=0)
-        # Compute consistency loss
-        loss_consistency = consistency_loss(pred)
-        pred = pred.mean(dim=0, keepdim=True)
-        feature = feature.mean(dim=0, keepdim=True)
-
-        # Get posterior
-        posterior = torch.softmax(pred, dim=1)
-        # Get pseudo label
-        pseudo_label = torch.argmax(posterior / (self.prior + 1e-8), dim=1, keepdim=True)
-        # Compute masked CE loss
-        mask = pseudo_label == self.class_idx if self.class_idx != -1 else 1
-        loss = self.lambda_ent * F.cross_entropy(pred * mask, pseudo_label.squeeze(1))
-        loss += self.lambda_consistency * loss_consistency
-        # Update model
-        self.optimizer.zero_grad()
-        loss.backward()
-        self.optimizer.step()
-        # Update prior
-        self.total_step += 1
-        new_prior = torch.eye(self.num_class)[pseudo_label.flatten()].sum(dim=0)[None, :, None, None]
-        new_prior /= new_prior.sum(dim=1, keepdim=True)
-        new_prior = self.TTA_alpha / self.num_class + (1 - self.TTA_alpha) * new_prior
-        self.prior = self.TTA_alpha * self.prior + (1 - self.TTA_alpha) * new_prior
-        return posterior, feature

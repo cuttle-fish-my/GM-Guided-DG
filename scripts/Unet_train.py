@@ -25,7 +25,7 @@ def main():
     )
     # add num_class to args
     args.num_class = len(dataset.meta_info["class_list"])
-    model = create_model(Segment=True, num_class=args.num_class,
+    model = create_model(num_class=args.num_class,
                          **args_to_dict(args, model_defaults().keys()))
     model.to(utils.dev())
     logger.log("creating data loader...")

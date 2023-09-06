@@ -58,8 +58,8 @@ def CalDice3D(prediction: List[torch.Tensor],  # List[B, C, H, W, S]
         write_metric(writer, ref_Dices, "reference_" + metric_name, class_list) if reference_result else None
 
 
-def CalDice(prediction: torch.Tensor,  # [B, C, H, W]
-            groundTruth: torch.Tensor,  # [B, C, H, W]
+def CalDice(prediction: torch.Tensor,  # [B, C, H, W, (S)]
+            groundTruth: torch.Tensor,  # [B, C, H, W, (S)]
             class_list: List[str],
             metric_name: str = "dice",
             writer: SummaryWriter = None,

@@ -16,16 +16,6 @@ def load_data(
         dataset,
         batch_size,
 ):
-    """
-    For a dataset, create a generator over (images, kwargs) pairs.
-
-    Each images is an NCHW float tensor, and the kwargs dict contains zero or
-    more keys, each of which map to a batched Tensor of their own.
-    The kwargs dict can be used for class labels, in which case the key is "y"
-    and the values are integer tensors of class labels.
-    :param dataset: the dataset to load.
-    :param batch_size: the batch size of each returned pair.
-    """
     loader = DataLoader(
         dataset, batch_size=batch_size, shuffle=True, num_workers=0, drop_last=True
     )

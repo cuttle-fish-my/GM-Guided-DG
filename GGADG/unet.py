@@ -53,9 +53,6 @@ class Discriminator(nn.Module):
 
 
 class AttentionPool2d(nn.Module):
-    """
-    Adapted from CLIP: https://github.com/openai/CLIP/blob/main/clip/model.py
-    """
 
     def __init__(
             self,
