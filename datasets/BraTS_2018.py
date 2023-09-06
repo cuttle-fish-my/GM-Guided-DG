@@ -79,8 +79,8 @@ class BraTSProcessor(BaseProcessor):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--save_dir", type=str, default="./BraTS")
-    parser.add_argument("--root", type=str, default="./BraTS_Raw")
+    parser.add_argument("--save_dir", type=str, default="./BraTS2018")
+    parser.add_argument("--root", type=str, default="./BraTS2018_Raw")
     parser.add_argument("--source", type=str, default="t2")
     parser.add_argument("--target", type=str, default="t1ce")
     parser.add_argument("--save_meta_info", type=bool, default=True)
