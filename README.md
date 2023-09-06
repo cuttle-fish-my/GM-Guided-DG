@@ -3,7 +3,7 @@
 ### 0. Platform Support
 We only guarantee the correctness of the code on the following platform:
 * Linux
-* MacOS (with `MPS` enabled only for inference)
+* MacOS (with `MPS` acceleration)
 ### 1. Install dependencies
 We highly recommend you to create a new virtual environment for this project. The following command will install all the dependencies.
 ```bash
@@ -84,6 +84,19 @@ python ./scripts/Unet_train.py \
         --save_dir ./saved_models/<EXP_Name> \
         --lr 1e-4 \
         --batch_size 24 \
+        --save_interval 1000 \
+        --lr_anneal_steps 10000 \
+        --modality source \
+        --input_mode magnitude \
+        --heavy_aug True
+```
+```bash
+python ./scripts/Unet_train.py \
+        --data_dir ./datasets/MS-CMRSeg2019_C02LGE/train \
+        --use_fp16 False \
+        --save_dir ./saved_models/TEST \
+        --lr 1e-4 \
+        --batch_size 1 \
         --save_interval 1000 \
         --lr_anneal_steps 10000 \
         --modality source \
