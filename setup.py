@@ -1,8 +1,8 @@
 from setuptools import setup
 
 setup(
-    name="GGADG",
-    py_modules=["GGADG"],
+    name="GMGADG",
+    py_modules=["GMGADG"],
     install_requires=[
         "matplotlib",
         "numpy",

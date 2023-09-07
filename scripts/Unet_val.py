@@ -11,16 +11,16 @@ from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 
-from GGADG import utils
-from GGADG.image_datasets import ImageDataset
-from GGADG.losses import entropy_map
-from GGADG.script_util import (
+from GMGADG import utils
+from GMGADG.image_datasets import ImageDataset
+from GMGADG.losses import entropy_map
+from GMGADG.script_util import (
     model_defaults,
     create_model,
     args_to_dict,
     add_dict_to_argparser,
 )
-from GGADG.train_util import TestTimeAdaptationAgent, PseudoLabelAgent
+from GMGADG.train_util import TestTimeAdaptationAgent, PseudoLabelAgent
 
 
 def main():

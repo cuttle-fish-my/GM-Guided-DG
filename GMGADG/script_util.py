@@ -1,5 +1,5 @@
 import argparse
-from GGADG.unet import SegUnet
+from GMGADG.unet import SegUnet
 
 NUM_CLASSES = 1000
 

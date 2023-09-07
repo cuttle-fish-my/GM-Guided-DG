@@ -7,13 +7,13 @@ from einops import rearrange
 from torch.nn import functional as F
 from torch.optim import AdamW
 
-from GGADG import logger
-from GGADG import utils
-from GGADG.fp16_util import MixedPrecisionTrainer
-from GGADG.losses import *
-from GGADG.nn import update_ema
-from GGADG.script_util import create_model, args_to_dict, model_defaults
-from GGADG.unet import Discriminator
+from GMGADG import logger
+from GMGADG import utils
+from GMGADG.fp16_util import MixedPrecisionTrainer
+from GMGADG.losses import *
+from GMGADG.nn import update_ema
+from GMGADG.script_util import create_model, args_to_dict, model_defaults
+from GMGADG.unet import Discriminator
 
 INITIAL_LOG_LOSS_SCALE = 20.0
 

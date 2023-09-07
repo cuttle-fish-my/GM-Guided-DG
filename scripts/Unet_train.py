@@ -2,16 +2,16 @@ import argparse
 
 from torch.utils.tensorboard import SummaryWriter
 
-from GGADG import utils
-from GGADG import logger
-from GGADG.image_datasets import ImageDataset, UnpairedDataset, load_data
-from GGADG.script_util import (
+from GMGADG import utils
+from GMGADG import logger
+from GMGADG.image_datasets import ImageDataset, UnpairedDataset, load_data
+from GMGADG.script_util import (
     model_defaults,
     create_model,
     args_to_dict,
     add_dict_to_argparser,
 )
-from GGADG.train_util import SegmentTrainLoop, UDATrainLoop
+from GMGADG.train_util import SegmentTrainLoop, UDATrainLoop
 
 
 def main():

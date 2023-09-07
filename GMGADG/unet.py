@@ -7,9 +7,9 @@ import torch as th
 import torch.nn as nn
 import torch.nn.functional as F
 
-from GGADG import utils
-from GGADG.fp16_util import convert_module_to_f16, convert_module_to_f32
-from GGADG.nn import (
+from GMGADG import utils
+from GMGADG.fp16_util import convert_module_to_f16, convert_module_to_f32
+from GMGADG.nn import (
     checkpoint,
     conv_nd,
     linear,

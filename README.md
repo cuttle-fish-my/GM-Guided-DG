@@ -1,4 +1,4 @@
-# Gradient-Guided Adaptive Domain Generalization for Cross Modality MRI Segmentation
+# Gradient-Map-Guided Adaptive Domain Generalization for Cross Modality MRI Segmentation
 ## Guidelines
 ### 0. Platform Support
 We only guarantee the correctness of the code on the following platform:
@@ -115,8 +115,8 @@ You can test the model with the following command:
 ```bash
 python ./scripts/Unet_val.py \
 --data_dir ./datasets/<DATASET>/val \
---save_dir ../val_res/<EXP_NAME> \
---model_path ../saved_models/<EXP_NAME>/model010000.pt \
+--save_dir ./val_res/<EXP_NAME> \
+--model_path ./saved_models/<EXP_NAME>/model010000.pt \
 --dropout 0.0 \
 --input_mode magnitude \
 --modality target \
@@ -125,6 +125,24 @@ python ./scripts/Unet_val.py \
 --TTA_steps 2 \
 --TTA_episodic True \
 --TTA_alpha <TTA_ALPHA> \
+--TTA_class_idx 1 \
+--lambda_BN 0.4 \
+--lambda_ent 1 \
+--lambda_consistency 1
+```
+```bash
+python ./scripts/Unet_val.py \
+--data_dir ./datasets/MS-CMRSeg2019_C02LGE/val \
+--save_dir ./val_res/AUG_M_BN \
+--model_path ./AUG_M_BN/model010000.pt \
+--dropout 0.0 \
+--input_mode magnitude \
+--modality target \
+--TTA_mode PseudoLabel \
+--TTA_lr 1e-2 \
+--TTA_steps 2 \
+--TTA_episodic True \
+--TTA_alpha 0.9 \
 --TTA_class_idx 1 \
 --lambda_BN 0.4 \
 --lambda_ent 1 \
