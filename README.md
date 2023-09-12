@@ -90,19 +90,6 @@ python ./scripts/Unet_train.py \
         --input_mode magnitude \
         --heavy_aug True
 ```
-```bash
-python ./scripts/Unet_train.py \
-        --data_dir ./datasets/MS-CMRSeg2019_C02LGE/train \
-        --use_fp16 False \
-        --save_dir ./saved_models/TEST \
-        --lr 1e-4 \
-        --batch_size 1 \
-        --save_interval 1000 \
-        --lr_anneal_steps 10000 \
-        --modality source \
-        --input_mode magnitude \
-        --heavy_aug True
-```
 You can visualize the intermediate results with the following command:
 ```bash
 tensorboard --logdir ./saved_models/<EXP_NAME>
@@ -125,24 +112,6 @@ python ./scripts/Unet_val.py \
 --TTA_steps 2 \
 --TTA_episodic True \
 --TTA_alpha <TTA_ALPHA> \
---TTA_class_idx 1 \
---lambda_BN 0.4 \
---lambda_ent 1 \
---lambda_consistency 1
-```
-```bash
-python ./scripts/Unet_val.py \
---data_dir ./datasets/MS-CMRSeg2019_C02LGE/val \
---save_dir ./val_res/AUG_M_BN \
---model_path ./AUG_M_BN/model010000.pt \
---dropout 0.0 \
---input_mode magnitude \
---modality target \
---TTA_mode PseudoLabel \
---TTA_lr 1e-2 \
---TTA_steps 2 \
---TTA_episodic True \
---TTA_alpha 0.9 \
 --TTA_class_idx 1 \
 --lambda_BN 0.4 \
 --lambda_ent 1 \
