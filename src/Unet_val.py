@@ -3,7 +3,7 @@ import os
 import pathlib
 import sys
 from datetime import datetime
-
+import json
 import PIL.Image
 import numpy as np
 import torch.nn
@@ -105,14 +105,10 @@ def main():
     labels = labels.values()
     preds = preds.values()
 
-    label_2d = torch.cat([torch.cat(label, dim=0) for label in labels], dim=0)
-    pred_2d = torch.cat([torch.cat(pred, dim=0) for pred in preds], dim=0)
-
-    utils.CalDice(pred_2d, label_2d, dataset.meta_info['class_list'], "dice_2d", writer, False)
-
     label_3d = [torch.stack(label, dim=4) for label in labels]
     pred_3d = [torch.stack(pred, dim=4) for pred in preds]
-    utils.CalDice3D(pred_3d, label_3d, dataset.meta_info['class_list'], "dice_3d", writer, False)
+    metric_dict = utils.CalDice3D(pred_3d, label_3d, dataset.meta_info['class_list'], "dice_3d", writer, False)
+    json.dump(metric_dict, open(os.path.join(args.save_dir, args.modality, 'metric.json'), 'w'))
 
 
 def create_argparser():

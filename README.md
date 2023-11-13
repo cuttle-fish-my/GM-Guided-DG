@@ -1,20 +1,34 @@
 # Gradient-Map-Guided Adaptive Domain Generalization for Cross Modality MRI Segmentation
+[![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB.svg?logo=python)](https://www.python.org/) 
+[![PyTorch 2.1](https://img.shields.io/badge/PyTorch-2.1-EE4C2C.svg?logo=pytorch)](https://pytorch.org/docs/1.4.0/) 
+[![MIT](https://img.shields.io/badge/License-MIT-3DA639.svg?logo=open-source-initiative)]()
+
+This is the official code repository for 
+[*Gradient-Map-Guided Adaptive Domain Generalization for Cross Modality MRI Segmentation*]() 
+by [Bingnan Li](https://cuttle-fish-my.github.io/libingnan.github.io/), 
+[Zhitong Gao](https://gaozhitong.github.io), 
+[Xuming He](https://xmhe.bitbucket.io)
+([ML4H 2023](https://ml4health.github.io/2023/)).
+
+### Abstract
+> Cross-modal MRI segmentation is of great value for computer-aided medical diagnosis, enabling flexible data acquisition and model generaliza- tion. However, most existing methods have dif- ficulty in handling local variations in domain shift and typically require a significant amount of data for training, which hinders their us- age in practice. To address these problems, we propose a novel adaptive domain general- ization framework, which integrates a learning- free cross-domain representation based on im- age gradient maps and a class prior-informed test-time adaptation strategy for mitigating lo- cal domain shift. We validate our approach on two multi-modal MRI datasets with six cross- modal segmentation tasks. Across all the task settings, our method consistently outperforms competing approaches and shows a stable per- formance even with limited training data. 
+### Pipeline
+![avatar](./images/pipeline.png)
 ## Guidelines
 ### 0. Platform Support
-We only guarantee the correctness of the code on the following platform:
+We only guarantee the correctness of the code on the following platforms:
 * Linux
 * MacOS (with `MPS` acceleration)
 ### 1. Install dependencies
-We highly recommend you to create a new virtual environment for this project. The following command will install all the dependencies.
 ```bash
 pip install -r requirements.txt
 ```
 ### 2. Download the dataset
-We do not directly provide the dataset. You can download the datasets used in our experiments with instructions in the following links:
+You can download the datasets used in our experiments with instructions in the following links:
 - [BraTS 2018](https://www.med.upenn.edu/sbia/brats2018/data.html)
 - [MS-CMRSeg 2019](https://zmiclab.github.io/zxh/0/mscmrseg19/)
 
-Once you download the datasets, please place the folders into `datasets` with the name of `BraTS2018_Raw` and `MS-CMRSeg2019_Raw` respectively. The folder structure should be like:
+Once download the datasets, please place the folders into `datasets` with the name of `BraTS2018_Raw` and `MS-CMRSeg2019_Raw` respectively. The folder structure should be like:
 ```
 BraTS2018_Raw
 ├── HGG
@@ -41,7 +55,6 @@ MS-CMRSeg2019_Raw
     └── t2gt
 ```
 ### 3. Preprocess the dataset
-We provide the preprocessing script for each dataset. You can preprocess the dataset with the following commands:
 #### BraTS2018
 ```bash
 declare -a SOURCE=("t2" "flair")
@@ -76,52 +89,30 @@ do
 done
 ```
 ### 4. Train the model
-You can train the model with the following command:
 ```bash
-python ./scripts/Unet_train.py \
-        --data_dir ./datasets/<DATASET>/train \
-        --use_fp16 False \
-        --save_dir ./saved_models/<EXP_Name> \
-        --lr 1e-4 \
-        --batch_size 24 \
-        --save_interval 1000 \
-        --lr_anneal_steps 10000 \
-        --modality source \
-        --input_mode magnitude \
-        --heavy_aug True
+cd scripts
+bash train_<source_domain>.sh
 ```
-You can visualize the intermediate results with the following command:
+To visualize the intermediate results, use the following command:
 ```bash
-tensorboard --logdir ./saved_models/<EXP_NAME>
+tensorboard --logdir ./saved_models/<DATASET>/<SOURCE_DOMAIN>/<EXP_NAME>
 ```
 #### Remark: 
-* `<DATASET>` is the name of generated folders in [Section 3](#3-preprocess-the-dataset).
-* Only set `--use_fp16` `True` when using NVIDIA GPU.
+* Only set `--use_fp16` `True` when using `NVIDIA GPU` or `MPS`.
 ### 5. Test the model
-You can test the model with the following command:
 ```bash
-python ./scripts/Unet_val.py \
---data_dir ./datasets/<DATASET>/val \
---save_dir ./val_res/<EXP_NAME> \
---model_path ./saved_models/<EXP_NAME>/model010000.pt \
---dropout 0.0 \
---input_mode magnitude \
---modality target \
---TTA_mode PseudoLabel \
---TTA_lr 1e-2 \
---TTA_steps 2 \
---TTA_episodic True \
---TTA_alpha <TTA_ALPHA> \
---TTA_class_idx 1 \
---lambda_BN 0.4 \
---lambda_ent 1 \
---lambda_consistency 1
+cd scripts
+bash test_<SETTING>.sh
 ```
+We only provide the test scripts of `C02LGE` and `t22t1`.
+You can easily modify the scripts to test any settings in our paper.
 #### Remark:
-* `<TTA_ALPHA>` is `0.5` for BraTS2018 and `0.9` for MS-CMRSeg2019
-
 If you want to see the segmentation results and formal evaluation metrics, use the following command:
 ```bash
-tensorboard --logdir ./val_res/<EXP_NAME>
+tensorboard --logdir ./val_res/<DATASET>/<SETTING>/<EXP_NAME>
 ```
 
+### Citation
+```angular2html
+Coming Soon
+```

@@ -39,8 +39,8 @@ def load_state_dict(path, **kwargs):
     return torch.load(io.BytesIO(data), **kwargs)
 
 
-def CalDice3D(prediction: List[torch.Tensor],  # List[B, C, H, W, S]
-              groundTruth: List[torch.Tensor],  # List[B, C, H, W, S]
+def CalDice3D(prediction: List[torch.Tensor],  # List[Batch, Channel, Height, Width, Slices]
+              groundTruth: List[torch.Tensor],  # List[Batch, Channel, Height, Width, Slices]
               class_list: List[str],
               metric_name: str = "dice_3d",
               writer: SummaryWriter = None,
@@ -52,10 +52,11 @@ def CalDice3D(prediction: List[torch.Tensor],  # List[B, C, H, W, S]
         Dices.append(dice_dict["dice"])
         ref_Dices.append(dice_dict["ref_dice"]) if reference_result else None
     Dices = torch.Tensor(Dices).mean(dim=0).tolist()
-    write_metric(writer, Dices, metric_name, class_list)
+    metric_dict = write_metric(writer, Dices, metric_name, class_list)
     if reference_result:
         ref_Dices = torch.Tensor(ref_Dices).mean(dim=0).tolist()
         write_metric(writer, ref_Dices, "reference_" + metric_name, class_list) if reference_result else None
+    return metric_dict
 
 
 def CalDice(prediction: torch.Tensor,  # [B, C, H, W, (S)]
@@ -103,14 +104,17 @@ def CalDice(prediction: torch.Tensor,  # [B, C, H, W, (S)]
 
 def write_metric(writer, metric, metric_name, class_list):
     print(f"{metric_name}: ")
+    metric_dict = {}
     table_html = f"<table><tr><th>Class</th><th>{metric_name}</th></tr>"
     for i, name in enumerate(class_list):
         if name == "BG":
             continue
         table_html += f"<tr><td>{name}</td><td>{metric[i]:.4}</td></tr>"
         print(f"\t {name}: {metric[i]:.4} ")
+        metric_dict[name] = metric[i]
     table_html += "</table>"
     writer.add_text(f"metrics/{metric_name}", table_html)
+    return metric_dict
 
 
 def apply_mask(pred, img):
