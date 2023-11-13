@@ -11,7 +11,7 @@ by [Bingnan Li](https://cuttle-fish-my.github.io/libingnan.github.io/),
 [Xuming He](https://xmhe.bitbucket.io)
 ([ML4H 2023](https://ml4health.github.io/2023/)).
 
-### Abstract
+### 📜 Abstract
 
 > Cross-modal MRI segmentation is of great value for computer-aided medical diagnosis, enabling flexible data
 > acquisition and model generaliza- tion. However, most existing methods have dif- ficulty in handling local variations
@@ -28,7 +28,7 @@ by [Bingnan Li](https://cuttle-fish-my.github.io/libingnan.github.io/),
 
 ![avatar](./images/pipeline.png)
 
-## Guidelines
+## 🚀 Guidelines
 
 ### 0. Platform Support
 
@@ -56,10 +56,10 @@ and `MS-CMRSeg2019_Raw` respectively. The folder structure should be like:
 ```
 BraTS2018_Raw
 ├── HGG
-│   ├── Brats18_2013_10_1
-│   ├── Brats18_2013_11_1
-│   ├── ...
-│   └── Brats18_TCIA08_469_1
+│   ├── Brats18_2013_10_1
+│   ├── Brats18_2013_11_1
+│   ├── ...
+│   └── Brats18_TCIA08_469_1
 └── LGG
     ├── Brats18_2013_0_1
     ├── Brats18_2013_15_1
@@ -70,9 +70,9 @@ BraTS2018_Raw
 ```
 MS-CMRSeg2019_Raw
 ├── C0LET2_gt_for_challenge19
-│   ├── C0_manual_10
-│   ├── LGE_manual_35_TestData
-│   └── T2_manual_10
+│   ├── C0_manual_10
+│   ├── LGE_manual_35_TestData
+│   └── T2_manual_10
 └── C0LET2_nii45_for_challenge19
     ├── c0gt
     ├── c0t2lge
@@ -162,7 +162,7 @@ tensorboard --logdir ./val_res/<DATASET>/<SETTING>/<EXP_NAME>
 |   BraTS2018   |      t2       |  [ckpt](https://drive.google.com/file/d/1Z6AvTQmGyA03ehivOpfBHuseFA97q0ov/view?usp=sharing)   |      -       |       -       |    0.6813    |     0.6914     | 105.6M |
 |   BraTS2018   |     flair     |  [ckpt](https://drive.google.com/file/d/1rAdST_vNGqXPcoAbI6_XHR2IycP5ZRjM/view?usp=sharing)   |      -       |       -       |    0.4189    |     0.5986     | 105.6M |
 
-### Citation
+### 📝 Citation
 
 ```angular2html
 Coming Soon
