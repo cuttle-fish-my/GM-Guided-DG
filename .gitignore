@@ -3,8 +3,6 @@
 *.pt
 *.pth
 *.npy
-*.jpg
-*.png
 *.npz
 *.zip
 *.gz
