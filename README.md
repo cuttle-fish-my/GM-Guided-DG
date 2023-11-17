@@ -5,7 +5,7 @@
 [![MIT](https://img.shields.io/badge/License-MIT-3DA639.svg?logo=open-source-initiative)]()
 
 This is the official code repository for
-[*Gradient-Map-Guided Adaptive Domain Generalization for Cross Modality MRI Segmentation*]()
+[*Gradient-Map-Guided Adaptive Domain Generalization for Cross Modality MRI Segmentation*](https://arxiv.org/abs/2311.09737)
 by [Bingnan Li](https://cuttle-fish-my.github.io/libingnan.github.io/),
 [Zhitong Gao](https://gaozhitong.github.io),
 [Xuming He](https://xmhe.bitbucket.io)
@@ -34,11 +34,13 @@ by [Bingnan Li](https://cuttle-fish-my.github.io/libingnan.github.io/),
 
 We only guarantee the correctness of the code on the following platforms:
 
-* Linux
+* Linux (with `cuda` acceleration)
 * MacOS (with `MPS` acceleration)
 
-### 1. Install dependencies
+### 1. Create Environment
+We use `Python 3.11`, feel free to use `conda` or `venv` to create the environment.
 
+Once you have created the environment, install the dependencies with the following command:
 ```bash
 pip install -r requirements.txt
 ```
@@ -164,6 +166,13 @@ tensorboard --logdir ./val_res/<DATASET>/<SETTING>/<EXP_NAME>
 
 ### 📝 Citation
 
-```angular2html
-Coming Soon
+```bibtex
+@misc{li2023gradientmapguided,
+      title={Gradient-Map-Guided Adaptive Domain Generalization for Cross Modality MRI Segmentation}, 
+      author={Bingnan Li and Zhitong Gao and Xuming He},
+      year={2023},
+      eprint={2311.09737},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
 ```
