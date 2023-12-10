@@ -165,7 +165,24 @@ tensorboard --logdir ./val_res/<DATASET>/<SETTING>/<EXP_NAME>
 |   BraTS2018   |     flair     |  [ckpt](https://drive.google.com/file/d/1rAdST_vNGqXPcoAbI6_XHR2IycP5ZRjM/view?usp=sharing)   |      -       |       -       |    0.4189    |     0.5986     | 105.6M |
 
 ### 📝 Citation
+```bibtex
+@InProceedings{pmlr-v225-li23a,
+  title = 	 {Gradient-Map-Guided Adaptive Domain Generalization for Cross Modality MRI Segmentation},
+  author =       {Li, Bingnan and Gao, Zhitong and He, Xuming},
+  booktitle = 	 {Proceedings of the 3rd Machine Learning for Health Symposium},
+  pages = 	 {292--306},
+  year = 	 {2023},
+  editor = 	 {Hegselmann, Stefan and Parziale, Antonio and Shanmugam, Divya and Tang, Shengpu and Asiedu, Mercy Nyamewaa and Chang, Serina and Hartvigsen, Tom and Singh, Harvineet},
+  volume = 	 {225},
+  series = 	 {Proceedings of Machine Learning Research},
+  month = 	 {10 Dec},
+  publisher =    {PMLR},
+  pdf = 	 {https://proceedings.mlr.press/v225/li23a/li23a.pdf},
+  url = 	 {https://proceedings.mlr.press/v225/li23a.html},
+  abstract = 	 {Cross-modal MRI segmentation is of great value for computer-aided medical diagnosis, enabling flexible data acquisition and model generalization. However, most existing methods have difficulty in handling local variations in domain shift and typically require a significant amount of data for training, which hinders their usage in practice. To address these problems, we propose a novel adaptive domain generalization framework, which integrates a learning-free cross-domain representation based on image gradient maps and a class prior-informed test-time adaptation strategy for mitigating local domain shift. We validate our approach on two multi-modal MRI datasets with six cross-modal segmentation tasks. Across all the task settings, our method consistently outperforms competing approaches and shows a stable performance even with limited training data. Our Codes are available now at https://github.com/cuttle-fish-my/GM-Guided-DG .}
+}
 
+```
 ```bibtex
 @misc{li2023gradientmapguided,
       title={Gradient-Map-Guided Adaptive Domain Generalization for Cross Modality MRI Segmentation}, 
