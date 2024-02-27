@@ -4,7 +4,17 @@ TRAIN_FLAGS="--data_dir ../datasets/BraTS_t22t1/val
                         --in_channels 3
                         --model_path ../saved_models/BraTS/t2/GMGDG/model010000.pt
                         --norm_type BN
-                        --save_dir ../val_res/BraTS/t22t1"
+                        --dropout 0.0
+                        --save_dir ../val_res/BraTS/t22t1
+                        --TTA_mode PseudoLabel
+                        --TTA_lr 1e-2
+                        --TTA_steps 2
+                        --TTA_episodic True
+                        --TTA_alpha 0.5
+                        --TTA_class_idx 1
+                        --lambda_BN 0.4
+                        --lambda_ent 1
+                        --lambda_consistency 1"
 # activate your virtual environment (maybe?)
 # source [your pip venv]
 # or
