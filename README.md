@@ -13,16 +13,7 @@ by [Bingnan Li](https://cuttle-fish-my.github.io/libingnan.github.io/),
 
 ### 📜 Abstract
 
-> Cross-modal MRI segmentation is of great value for computer-aided medical diagnosis, enabling flexible data
-> acquisition and model generaliza- tion. However, most existing methods have dif- ficulty in handling local variations
-> in
-> domain shift and typically require a significant amount of data for training, which hinders their us- age in practice.
-> To address these problems, we propose a novel adaptive domain general- ization framework, which integrates a learning-
-> free cross-domain representation based on im- age gradient maps and a class prior-informed test-time adaptation
-> strategy
-> for mitigating lo- cal domain shift. We validate our approach on two multi-modal MRI datasets with six cross- modal
-> segmentation tasks. Across all the task settings, our method consistently outperforms competing approaches and shows a
-> stable per- formance even with limited training data.
+> Cross-modal MRI segmentation is of great value for computer-aided medical diagnosis, enabling flexible data acquisition and model generalization. However, most existing methods have difficulty in handling local variations in domain shift and typically require a significant amount of data for training, which hinders their usage in practice. To address these problems, we propose a novel adaptive domain general- ization framework, which integrates a learning-free cross-domain representation based on image gradient maps and a class prior-informed test-time adaptation strategy for mitigating local domain shift. We validate our approach on two multi-modal MRI datasets with six cross-modal segmentation tasks. Across all the task settings, our method consistently outperforms competing approaches and shows a stable performance even with limited training data.
 
 ### Pipeline
 
